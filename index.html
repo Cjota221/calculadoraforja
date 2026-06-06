@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forja — você forja o preço certo.</title>
   <meta name="description" content="Forja é a calculadora de precificação inteligente para marketplaces. Mercado Livre, Shopee, Amazon e TikTok Shop." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23FF5F1F'/><text x='16' y='24' font-family='Arial Black,sans-serif' font-size='22' font-weight='900' text-anchor='middle' fill='white'>F</text></svg>" />
+  <link rel="icon" type="image/png" href="assets/brand/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -44,15 +44,11 @@
 
     /* ── HEADER ── */
     .header { margin-bottom: 28px; }
-    .header-eye {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px; color: var(--meta);
-      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
-    }
-    .header-title {
-      font-family: 'Anton', sans-serif;
-      font-size: clamp(26px, 4.5vw, 38px);
-      line-height: 1; text-transform: uppercase; color: #FF5F1F; letter-spacing: 0.04em; margin-bottom: 6px;
+    .header-logo {
+      height: clamp(32px, 5vw, 48px);
+      width: auto;
+      display: block;
+      margin-bottom: 6px;
     }
     .header-sub {
       font-family: 'DM Mono', monospace;
@@ -398,7 +394,7 @@
 
   <!-- HEADER -->
   <header class="header">
-    <h1 class="header-title">FORJA</h1>
+    <img src="assets/brand/logo-forja.png" alt="Forja" class="header-logo" />
     <p class="header-sub">você forja o preço certo.</p>
   </header>
 
