@@ -1,0 +1,14 @@
+{
+  "name": "calculadora-marketplace-cj",
+  "version": "1.0.0",
+  "description": "Calculadora de Marketplace CJ Rasteirinhas — Shopee & TikTok Shop",
+  "engines": {
+    "node": "18"
+  },
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
