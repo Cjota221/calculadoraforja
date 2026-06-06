@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forja — você forja o preço certo.</title>
+  <meta name="description" content="A calculadora de precificação inteligente para marketplaces. Mercado Livre, Shopee, Amazon e TikTok Shop. Com análise de mercado por IA." />
+  <link rel="icon" type="image/png" href="assets/brand/favicon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://calculadoraforja.netlify.app/" />
+  <meta property="og:title" content="Forja — você forja o preço certo." />
+  <meta property="og:description" content="A calculadora de precificação inteligente para marketplaces. Acesso vitalício por R$ 99,90." />
+  <meta property="og:image" content="https://calculadoraforja.netlify.app/assets/brand/og-banner.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ember:      #FF5F1F;
+      --ember-dark: #D94E10;
+      --ember-bg:   #FFF3EE;
+      --profit:     #0F6E56;
+      --profit-bg:  #D6F0E8;
+      --loss:       #993C1D;
+      --loss-bg:    #FCEBEB;
+      --ink:        #1A1A18;
+      --stone:      #6B6760;
+      --meta:       #9B9690;
+      --sand:       #F0EDE8;
+      --cream:      #FAFAF8;
+      --white:      #FFFFFF;
+      --dark:       #1A1A18;
+      --border:     #E5E3DC;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { font-family: 'Instrument Sans', sans-serif; color: var(--ink); background: var(--cream); }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; }
+
+    /* ── UTILS ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--meta);
+    }
+    .btn-ember {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--ember); color: #fff;
+      font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 0.04em;
+      padding: 15px 32px; border-radius: 8px; border: none; cursor: pointer;
+      transition: background .15s, transform .1s;
+      text-transform: uppercase;
+    }
+    .btn-ember:hover { background: var(--ember-dark); transform: translateY(-1px); }
+    .btn-ember:active { transform: translateY(0); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250,250,248,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--ember); letter-spacing: 0.04em; }
+    .nav-cta { font-size: 13px; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--cream);
+      padding: 80px 0 72px;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+    .hero-eyebrow { margin-bottom: 20px; }
+    .hero-brand { font-family: 'Anton', sans-serif; font-size: 36px; color: var(--ember); letter-spacing: 0.04em; line-height: 1; }
+    .hero-tagline { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--meta); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; }
+    .hero h1 {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(40px, 5vw, 60px);
+      line-height: 1.0; letter-spacing: 0.02em;
+      color: var(--ink); margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 18px; color: var(--stone); line-height: 1.6;
+      max-width: 520px; margin-bottom: 32px;
+    }
+    .hero-sub-cta {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      color: var(--meta); letter-spacing: 0.12em; text-transform: uppercase;
+      margin-top: 12px;
+    }
+    .hero-mockup {
+      background: var(--white); border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+      padding: 28px; overflow: hidden;
+    }
+    .mockup-bar { display: flex; gap: 6px; margin-bottom: 20px; }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sand); }
+    .mockup-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .mockup-row:last-child { border-bottom: none; }
+    .mockup-label { color: var(--stone); }
+    .mockup-val { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--ink); }
+    .mockup-val.ember { color: var(--ember); font-size: 15px; font-weight: 600; }
+    .mockup-val.profit { color: var(--profit); }
+    .mockup-price-box {
+      margin-top: 16px; background: var(--ember); border-radius: 8px;
+      padding: 14px 16px; color: white;
+    }
+    .mockup-price-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; }
+    .mockup-price-val { font-family: 'Anton', sans-serif; font-size: 28px; margin-top: 2px; }
+
+    /* ── DOR ── */
+    .section-pain {
+      background: var(--white); padding: 80px 0;
+    }
+    .section-title {
+      font-family: 'Anton', sans-serif; font-size: clamp(28px, 3.5vw, 38px);
+      color: var(--ink); letter-spacing: 0.02em; margin-bottom: 48px;
+    }
+    .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .pain-card {
+      border-left: 3px solid var(--loss); background: var(--loss-bg);
+      border-radius: 0 10px 10px 0; padding: 22px 20px;
+    }
+    .pain-icon { font-size: 20px; margin-bottom: 10px; }
+    .pain-text { color: #791F1F; font-size: 15px; font-weight: 500; line-height: 1.5; }
+
+    /* ── SOLUÇÃO ── */
+    .section-solution { background: var(--cream); padding: 80px 0; }
+    .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+    .feature-card {
+      background: var(--white); border-radius: 12px;
+      border: 1px solid var(--border); padding: 28px;
+    }
+    .feature-num {
+      font-family: 'Anton', sans-serif; font-size: 32px;
+      color: var(--ember); letter-spacing: 0.04em; line-height: 1;
+      margin-bottom: 10px;
+    }
+    .feature-title {
+      font-family: 'Anton', sans-serif; font-size: 18px;
+      color: var(--ink); letter-spacing: 0.02em; margin-bottom: 10px;
+    }
+    .feature-desc { font-size: 14px; color: var(--stone); line-height: 1.6; }
+
+    /* ── DEPOIMENTOS ── */
+    .section-proof { background: var(--white); padding: 80px 0; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial {
+      background: var(--white); border: 0.5px solid var(--border);
+      border-radius: 12px; padding: 28px; position: relative;
+    }
+    .testimonial-quote {
+      font-family: 'Anton', sans-serif; font-size: 64px; line-height: 0.7;
+      color: rgba(255,95,31,0.15); position: absolute; top: 20px; left: 22px;
+    }
+    .testimonial-text { font-size: 14px; color: var(--stone); line-height: 1.65; margin-bottom: 16px; position: relative; z-index: 1; padding-top: 20px; }
+    .testimonial-author { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: var(--ink); text-transform: uppercase; }
+
+    /* ── OFERTA ── */
+    .section-offer {
+      background: var(--dark); padding: 80px 0; text-align: center;
+    }
+    .offer-tag { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--meta); margin-bottom: 16px; }
+    .offer-title { font-family: 'Anton', sans-serif; font-size: clamp(36px, 5vw, 56px); color: #FAFAF8; letter-spacing: 0.02em; margin-bottom: 24px; }
+    .offer-price-old { font-size: 16px; color: var(--stone); text-decoration: line-through; margin-bottom: 6px; }
+    .offer-price {
+      font-family: 'Anton', sans-serif; font-size: clamp(52px, 7vw, 80px);
+      color: var(--ember); letter-spacing: 0.02em; line-height: 1;
+    }
+    .offer-price-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--meta); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 8px; margin-bottom: 36px; }
+    .offer-benefits { list-style: none; display: inline-flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 36px; }
+    .offer-benefits li { display: flex; align-items: center; gap: 10px; font-size: 15px; color: #FAFAF8; }
+    .offer-check { color: var(--profit); font-size: 18px; flex-shrink: 0; }
+    .offer-security { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--meta); margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    /* ── FAQ ── */
+    .section-faq { background: var(--cream); padding: 80px 0; }
+    .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+    .faq-item { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .faq-q {
+      width: 100%; text-align: left; padding: 18px 20px;
+      background: none; border: none; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 15px; color: var(--ink);
+      gap: 12px;
+    }
+    .faq-q:hover { color: var(--ember); }
+    .faq-icon { font-size: 18px; flex-shrink: 0; transition: transform .2s; color: var(--meta); }
+    .faq-item.open .faq-icon { transform: rotate(45deg); color: var(--ember); }
+    .faq-a { display: none; padding: 0 20px 18px; font-size: 14px; color: var(--stone); line-height: 1.65; }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark); padding: 40px 0;
+      text-align: center; border-top: 1px solid #2A2A28;
+    }
+    .footer-logo { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--ember); letter-spacing: 0.04em; }
+    .footer-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--meta); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; margin-bottom: 20px; }
+    .footer-copy { font-size: 12px; color: var(--meta); }
+    .footer-links { display: flex; gap: 20px; justify-content: center; margin-top: 10px; }
+    .footer-links a { font-size: 12px; color: var(--meta); }
+    .footer-links a:hover { color: var(--ember); }
+
+    /* ── MODAL CHECKOUT ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 16px;
+      width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+      padding: 32px;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .modal-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--ink); letter-spacing: 0.02em; }
+    .modal-close { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--meta); line-height: 1; padding: 0; }
+    .modal-close:hover { color: var(--ink); }
+    .modal-price { font-family: 'Anton', sans-serif; font-size: 36px; color: var(--ember); }
+    .modal-price-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--meta); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--meta); display: block; margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: var(--ink);
+      background: var(--cream); outline: none; transition: border-color .15s;
+    }
+    .form-input:focus { border-color: var(--ember); }
+    .payment-tabs { display: flex; gap: 4px; background: var(--sand); border-radius: 8px; padding: 3px; margin-bottom: 20px; }
+    .pay-tab {
+      flex: 1; padding: 9px; border: none; border-radius: 6px;
+      background: transparent; color: var(--stone); cursor: pointer;
+      font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 13px;
+      transition: all .15s;
+    }
+    .pay-tab.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .pay-panel { display: none; }
+    .pay-panel.active { display: block; }
+    .pix-box {
+      text-align: center; padding: 24px; background: var(--cream);
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .pix-qr { width: 180px; height: 180px; margin: 0 auto 12px; background: var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .pix-qr img { width: 100%; border-radius: 8px; }
+    .pix-copy { margin-top: 12px; }
+    .pix-code {
+      font-family: 'DM Mono', monospace; font-size: 10px; color: var(--stone);
+      word-break: break-all; background: var(--white); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px; margin-top: 8px; text-align: left;
+    }
+    .modal-error { color: var(--loss); font-size: 13px; margin-top: 8px; font-weight: 500; }
+    .modal-success {
+      text-align: center; padding: 20px 0;
+    }
+    .modal-success-icon { font-size: 48px; margin-bottom: 12px; }
+    .modal-success-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--profit); margin-bottom: 8px; }
+    .modal-success-text { font-size: 14px; color: var(--stone); line-height: 1.6; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── LOADING ── */
+    .btn-loading { opacity: 0.7; pointer-events: none; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin .6s linear infinite; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .hero-mockup { display: none; }
+      .hero { padding: 52px 0 48px; }
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 16px; }
+      .pain-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .section-pain, .section-solution, .section-proof, .section-offer, .section-faq { padding: 56px 0; }
+      .offer-price { font-size: 52px; }
+      .modal { padding: 24px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <div class="nav-logo">FORJA</div>
+    <button class="btn-ember nav-cta" onclick="openCheckout()">Garantir acesso — R$ 99,90</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">
+          <div class="hero-brand">FORJA</div>
+          <div class="hero-tagline">você forja o preço certo.</div>
+        </div>
+        <h1>PARE DE PERDER DINHEIRO NOS MARKETPLACES</h1>
+        <p>A única calculadora que mostra seu preço real de venda no Mercado Livre, Shopee, Amazon e TikTok Shop — com análise de mercado em tempo real por inteligência artificial.</p>
+        <button class="btn-ember" onclick="openCheckout()" style="font-size:16px;padding:16px 36px;">
+          GARANTIR ACESSO VITALÍCIO — R$ 99,90
+        </button>
+        <div class="hero-sub-cta">Uma vez só · Acesso para sempre · Sem mensalidade</div>
+      </div>
+      <div class="hero-mockup">
+        <div class="mockup-bar">
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+        </div>
+        <div class="mockup-row"><span class="mockup-label">Comissão Shopee (14%)</span><span class="mockup-val">R$ 33,04</span></div>
+        <div class="mockup-row"><span class="mockup-label">Taxa fixa</span><span class="mockup-val">R$ 20,00</span></div>
+        <div class="mockup-row"><span class="mockup-label">Frete obrigatório</span><span class="mockup-val">R$ 18,00</span></div>
+        <div class="mockup-row"><span class="mockup-label">Simples Nacional</span><span class="mockup-val">R$ 14,10</span></div>
+        <div class="mockup-row"><span class="mockup-label">Lucro</span><span class="mockup-val profit">R$ 28,34</span></div>
+        <div class="mockup-price-box">
+          <div class="mockup-price-label">Shopee — Preço sugerido</div>
+          <div class="mockup-price-val">R$ 235,60</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOR -->
+<section class="section-pain">
+  <div class="container">
+    <h2 class="section-title">VOCÊ ESTÁ PRECIFICANDO NO ESCURO?</h2>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">❌</div>
+        <div class="pain-text">Calcula no achismo e perde margem sem perceber — o preço que parece certo pode estar te dando prejuízo.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">❌</div>
+        <div class="pain-text">Não sabe se seu preço está acima ou abaixo do mercado — e perde vendas para concorrentes sem nem saber por quê.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">❌</div>
+        <div class="pain-text">Cada plataforma tem taxa diferente — e você soma tudo no mesmo cálculo errado e some no lucro no fim do mês.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUÇÃO -->
+<section class="section-solution">
+  <div class="container">
+    <h2 class="section-title">O FORJA RESOLVE ISSO EM SEGUNDOS</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-num">01</div>
+        <div class="feature-title">PRECIFICAÇÃO EXATA</div>
+        <div class="feature-desc">Calcula o preço mínimo de venda com margem real — não markup. Considera comissão, frete, imposto e lucro desejado de cada plataforma separadamente.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">02</div>
+        <div class="feature-title">ANÁLISE DE MERCADO COM IA</div>
+        <div class="feature-desc">O Grok pesquisa os preços dos seus concorrentes em tempo real no ML, Shopee, Amazon e TikTok Shop e entrega um veredito: você está barato, na média ou caro.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">03</div>
+        <div class="feature-title">4 PLATAFORMAS EM UM LUGAR</div>
+        <div class="feature-desc">Mercado Livre, Shopee, Amazon Brasil e TikTok Shop — com as taxas atualizadas de cada plataforma já configuradas. Sem precisar pesquisar em outro lugar.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">04</div>
+        <div class="feature-title">ACESSO VITALÍCIO</div>
+        <div class="feature-desc">Paga uma vez. Usa para sempre. Sem mensalidade, sem surpresa no cartão, sem renovação. Inclui todas as atualizações futuras.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROVA SOCIAL -->
+<section class="section-proof">
+  <div class="container">
+    <h2 class="section-title">QUEM JÁ USA O FORJA</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-text">Descobri que estava vendendo com margem negativa no ML há 3 meses. Depois do Forja, corrigi meu preço e minha margem foi de -2% pra 18%.</div>
+        <div class="testimonial-author">Camila R. — revendedora de calçados</div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-text">A análise de concorrentes é incrível. Em 10 segundos eu sei se meu preço está competitivo ou não. Economizo horas de pesquisa toda semana.</div>
+        <div class="testimonial-author">Fernanda S. — loja no Shopee</div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-text">Simples, rápida e precisa. Uso antes de cadastrar qualquer produto novo. Não consigo imaginar precificar sem o Forja.</div>
+        <div class="testimonial-author">Juliana M. — vendedora no ML e Amazon</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section class="section-offer" id="oferta">
+  <div class="container">
+    <div class="offer-tag">Oferta especial de lançamento</div>
+    <h2 class="offer-title">ACESSO VITALÍCIO</h2>
+    <div class="offer-price-old">R$ 197,00</div>
+    <div class="offer-price">R$ 99,90</div>
+    <div class="offer-price-sub">pagamento único · sem mensalidade</div>
+    <ul class="offer-benefits">
+      <li><span class="offer-check">✓</span> Calculadora completa para 4 plataformas</li>
+      <li><span class="offer-check">✓</span> Análise de mercado com Grok AI</li>
+      <li><span class="offer-check">✓</span> Atualizações inclusas para sempre</li>
+      <li><span class="offer-check">✓</span> Acesso imediato após o pagamento</li>
+    </ul>
+    <button class="btn-ember" onclick="openCheckout()" style="font-size:16px;padding:16px 40px;">
+      COMPRAR AGORA — R$ 99,90
+    </button>
+    <div class="offer-security">
+      <span>🔒</span> Pagamento seguro via Mercado Pago
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-faq">
+  <div class="container">
+    <h2 class="section-title" style="text-align:center;margin-bottom:36px;">PERGUNTAS FREQUENTES</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          O acesso é realmente vitalício?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Sim. Você paga uma única vez e tem acesso para sempre, incluindo todas as atualizações futuras da calculadora. Sem mensalidade, sem renovação.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Funciona para qualquer produto?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Sim. Você pode usar o Forja para qualquer produto vendido em marketplace — calçados, roupas, eletrônicos, cosméticos, artesanato, qualquer categoria.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          As taxas das plataformas são atualizadas?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Sim. Mantemos as taxas de comissão, frete e tarifas de cada plataforma atualizadas conforme as mudanças oficiais do Mercado Livre, Shopee, Amazon e TikTok Shop.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Preciso instalar alguma coisa?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Não. O Forja é 100% web. Você acessa pelo navegador em qualquer dispositivo — celular, tablet ou computador. Sem app para baixar, sem nada para instalar.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Como funciona o acesso após o pagamento?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Após a confirmação do pagamento, você recebe acesso imediato por e-mail com o link direto para a calculadora. O processo é automático e leva menos de 1 minuto.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">FORJA</div>
+    <div class="footer-tag">você forja o preço certo.</div>
+    <div class="footer-copy">© 2025 Forja · Todos os direitos reservados</div>
+    <div class="footer-links">
+      <a href="/termos.html">Termos de uso</a>
+      <a href="/privacidade.html">Política de privacidade</a>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL CHECKOUT -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <!-- PASSO 1: DADOS -->
+    <div id="step-dados">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">GARANTIR ACESSO</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--meta);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;">Forja Vitalício</div>
+        </div>
+        <button class="modal-close" onclick="closeCheckout()">×</button>
+      </div>
+      <div class="modal-price">R$ 99,90</div>
+      <div class="modal-price-sub">Pagamento único · Acesso para sempre</div>
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" type="text" id="inp-nome" placeholder="Seu nome" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" id="inp-email" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp (opcional)</label>
+        <input class="form-input" type="tel" id="inp-tel" placeholder="(11) 99999-9999" />
+      </div>
+      <div id="error-dados" class="modal-error"></div>
+      <button class="btn-ember" id="btn-continuar" onclick="continuarParaPagamento()" style="width:100%;margin-top:8px;">
+        CONTINUAR
+      </button>
+    </div>
+
+    <!-- PASSO 2: PAGAMENTO -->
+    <div id="step-pagamento" style="display:none;">
+      <div class="modal-header">
+        <button onclick="voltarParaDados()" style="background:none;border:none;cursor:pointer;color:var(--meta);font-size:14px;display:flex;align-items:center;gap:4px;">← Voltar</button>
+        <button class="modal-close" onclick="closeCheckout()">×</button>
+      </div>
+      <div class="modal-price" style="margin-bottom:4px;">R$ 99,90</div>
+      <div class="modal-price-sub">Escolha como pagar</div>
+      <div class="payment-tabs">
+        <button class="pay-tab active" onclick="switchPay('pix',this)">PIX</button>
+        <button class="pay-tab" onclick="switchPay('card',this)">Cartão</button>
+      </div>
+
+      <!-- PIX -->
+      <div class="pay-panel active" id="pay-pix">
+        <div id="pix-antes">
+          <p style="font-size:14px;color:var(--stone);margin-bottom:16px;line-height:1.5;">Clique em "Gerar PIX" para receber o QR Code. O acesso é liberado automaticamente após a confirmação.</p>
+          <div id="error-pix" class="modal-error"></div>
+          <button class="btn-ember" id="btn-gerar-pix" onclick="gerarPix()" style="width:100%;">GERAR PIX</button>
+        </div>
+        <div id="pix-qr-area" style="display:none;">
+          <div class="pix-box">
+            <div class="pix-qr" id="pix-qr-img">
+              <span style="font-size:12px;color:var(--meta);">Carregando...</span>
+            </div>
+            <div class="tag" style="margin-top:8px;">Escaneie com o app do banco</div>
+            <div class="pix-code" id="pix-code-text"></div>
+            <button onclick="copiarPix()" style="margin-top:10px;background:none;border:1px solid var(--border);border-radius:6px;padding:8px 16px;cursor:pointer;font-size:12px;color:var(--ink);">
+              Copiar código PIX
+            </button>
+          </div>
+          <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--stone);">
+            ⏳ Aguardando confirmação do pagamento...
+          </div>
+        </div>
+      </div>
+
+      <!-- CARTÃO -->
+      <div class="pay-panel" id="pay-card">
+        <div class="form-group">
+          <label class="form-label">Número do cartão</label>
+          <input class="form-input" type="text" id="inp-card-num" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Validade</label>
+            <input class="form-input" type="text" id="inp-card-exp" placeholder="MM/AA" maxlength="5" oninput="formatExp(this)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CVV</label>
+            <input class="form-input" type="text" id="inp-card-cvv" placeholder="123" maxlength="4" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome no cartão</label>
+          <input class="form-input" type="text" id="inp-card-name" placeholder="NOME SOBRENOME" style="text-transform:uppercase;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">CPF do titular</label>
+          <input class="form-input" type="text" id="inp-card-cpf" placeholder="000.000.000-00" maxlength="14" oninput="formatCpf(this)" />
+        </div>
+        <div id="error-card" class="modal-error"></div>
+        <button class="btn-ember" id="btn-pagar-card" onclick="pagarCartao()" style="width:100%;margin-top:8px;">
+          PAGAR R$ 99,90
+        </button>
+      </div>
+    </div>
+
+    <!-- PASSO 3: SUCESSO -->
+    <div id="step-sucesso" style="display:none;">
+      <div class="modal-success">
+        <div class="modal-success-icon">🎉</div>
+        <div class="modal-success-title">ACESSO LIBERADO!</div>
+        <div class="modal-success-text">
+          Seu pagamento foi confirmado. Você receberá um e-mail com o link de acesso em instantes.<br><br>
+          <strong>Bem-vinda ao Forja!</strong>
+        </div>
+        <button class="btn-ember" onclick="window.location.href='/index.html'" style="margin-top:24px;">
+          ACESSAR A CALCULADORA →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let userId = null;
+  let externalRef = null;
+  let pixCode = null;
+  let pollInterval = null;
+
+  /* ── MODAL ── */
+  function openCheckout() {
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCheckout() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (pollInterval) clearInterval(pollInterval);
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeCheckout();
+  }
+
+  /* ── FAQ ── */
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    item.classList.toggle('open');
+  }
+
+  /* ── PAGAMENTO TABS ── */
+  function switchPay(type, btn) {
+    document.querySelectorAll('.pay-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pay-' + type).classList.add('active');
+  }
+
+  /* ── FORMATAÇÃO ── */
+  function formatCard(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 16);
+    el.value = v.replace(/(.{4})/g, '$1 ').trim();
+  }
+  function formatExp(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 4);
+    if (v.length > 2) v = v.substring(0, 2) + '/' + v.substring(2);
+    el.value = v;
+  }
+  function formatCpf(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    el.value = v;
+  }
+
+  /* ── PASSO 1: DADOS ── */
+  async function continuarParaPagamento() {
+    const nome  = document.getElementById('inp-nome').value.trim();
+    const email = document.getElementById('inp-email').value.trim();
+    const tel   = document.getElementById('inp-tel').value.trim();
+    const errEl = document.getElementById('error-dados');
+    errEl.textContent = '';
+
+    if (!nome) { errEl.textContent = 'Informe seu nome.'; return; }
+    if (!email || !email.includes('@')) { errEl.textContent = 'Informe um e-mail válido.'; return; }
+
+    const btn = document.getElementById('btn-continuar');
+    btn.classList.add('btn-loading');
+    btn.innerHTML = '<span class="spinner"></span>Aguarde...';
+
+    try {
+      const res = await fetch('/.netlify/functions/criar-usuario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, telefone: tel })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.error || 'Erro ao processar. Tente novamente.'; return; }
+
+      userId = data.userId;
+      externalRef = data.externalRef;
+
+      document.getElementById('step-dados').style.display = 'none';
+      document.getElementById('step-pagamento').style.display = 'block';
+    } catch (e) {
+      errEl.textContent = 'Erro de conexão. Tente novamente.';
+    } finally {
+      btn.classList.remove('btn-loading');
+      btn.innerHTML = 'CONTINUAR';
+    }
+  }
+
+  function voltarParaDados() {
+    document.getElementById('step-pagamento').style.display = 'none';
+    document.getElementById('step-dados').style.display = 'block';
+  }
+
+  /* ── PIX ── */
+  async function gerarPix() {
+    const errEl = document.getElementById('error-pix');
+    errEl.textContent = '';
+    const btn = document.getElementById('btn-gerar-pix');
+    btn.classList.add('btn-loading');
+    btn.innerHTML = '<span class="spinner"></span>Gerando...';
+
+    try {
+      const email = document.getElementById('inp-email').value.trim();
+      const res = await fetch('/.netlify/functions/processar-pagamento', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'pix', email, externalRef })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.error || 'Erro ao gerar PIX.'; return; }
+
+      pixCode = data.qrCode;
+      document.getElementById('pix-antes').style.display = 'none';
+      document.getElementById('pix-qr-area').style.display = 'block';
+
+      const qrEl = document.getElementById('pix-qr-img');
+      if (data.qrCodeBase64) {
+        qrEl.innerHTML = `<img src="data:image/png;base64,${data.qrCodeBase64}" alt="QR Code PIX" />`;
+      } else {
+        qrEl.innerHTML = '<span style="font-size:12px;color:var(--meta);">QR Code gerado</span>';
+      }
+      document.getElementById('pix-code-text').textContent = pixCode || '';
+
+      // Poll para confirmar pagamento
+      pollInterval = setInterval(async () => {
+        try {
+          const r = await fetch(`/.netlify/functions/checkout-status?userId=${userId}`);
+          const d = await r.json();
+          if (d.status === 'ativo') {
+            clearInterval(pollInterval);
+            mostrarSucesso();
+          }
+        } catch {}
+      }, 5000);
+    } catch (e) {
+      errEl.textContent = 'Erro de conexão. Tente novamente.';
+    } finally {
+      btn.classList.remove('btn-loading');
+      btn.innerHTML = 'GERAR PIX';
+    }
+  }
+
+  function copiarPix() {
+    if (pixCode) navigator.clipboard.writeText(pixCode).then(() => alert('Código PIX copiado!'));
+  }
+
+  /* ── CARTÃO ── */
+  async function pagarCartao() {
+    const errEl = document.getElementById('error-card');
+    errEl.textContent = '';
+    const cardNum  = document.getElementById('inp-card-num').value.replace(/\s/g, '');
+    const cardExp  = document.getElementById('inp-card-exp').value;
+    const cardCvv  = document.getElementById('inp-card-cvv').value;
+    const cardName = document.getElementById('inp-card-name').value.trim();
+    const cardCpf  = document.getElementById('inp-card-cpf').value;
+    const email    = document.getElementById('inp-email').value.trim();
+
+    if (cardNum.length < 13) { errEl.textContent = 'Número do cartão inválido.'; return; }
+    if (!cardExp.includes('/')) { errEl.textContent = 'Validade inválida.'; return; }
+    if (!cardCvv) { errEl.textContent = 'Informe o CVV.'; return; }
+    if (!cardName) { errEl.textContent = 'Informe o nome no cartão.'; return; }
+    if (cardCpf.replace(/\D/g,'').length !== 11) { errEl.textContent = 'CPF inválido.'; return; }
+
+    const [month, year] = cardExp.split('/');
+    const btn = document.getElementById('btn-pagar-card');
+    btn.classList.add('btn-loading');
+    btn.innerHTML = '<span class="spinner"></span>Processando...';
+
+    try {
+      const res = await fetch('/.netlify/functions/processar-pagamento', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'card', email, externalRef,
+          card: { cardNumber: cardNum, expirationMonth: month, expirationYear: year, cvv: cardCvv, cardholderName: cardName, cpf: cardCpf }
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.error || 'Pagamento recusado.'; return; }
+      mostrarSucesso();
+    } catch (e) {
+      errEl.textContent = 'Erro de conexão. Tente novamente.';
+    } finally {
+      btn.classList.remove('btn-loading');
+      btn.innerHTML = 'PAGAR R$ 99,90';
+    }
+  }
+
+  /* ── SUCESSO ── */
+  function mostrarSucesso() {
+    document.getElementById('step-pagamento').style.display = 'none';
+    document.getElementById('step-sucesso').style.display = 'block';
+  }
+</script>
+</body>
+</html>

@@ -8,6 +8,18 @@
 [functions."market-analysis"]
   timeout = 30
 
+[functions."processar-pagamento"]
+  timeout = 30
+
+[functions."criar-usuario"]
+  timeout = 15
+
+[functions."webhook-mercadopago"]
+  timeout = 15
+
+[functions."checkout-status"]
+  timeout = 10
+
 [[headers]]
   for = "/*"
   [headers.values]
