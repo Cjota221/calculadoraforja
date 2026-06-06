@@ -21,6 +21,12 @@
   timeout = 10
 
 [[redirects]]
+  from = "/"
+  to = "/landing.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/webhook-mercadopago"
   to = "/.netlify/functions/webhook-mercadopago"
   status = 200
