@@ -40,46 +40,97 @@
     }
 
     /* ── LAYOUT ── */
-    .app { max-width: 980px; margin: 0 auto; padding: 28px 20px 80px; }
+    /* ── LAYOUT ── */
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .layout { display: flex; flex: 1; min-height: 100vh; }
 
-    /* ── HEADER ── */
-    .header {
-      margin-bottom: 36px;
+    /* ── TOPBAR (mobile only) ── */
+    .topbar { display: none; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--white);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 32px 20px 28px;
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
+      padding: 28px 14px 32px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
     }
-    .header-logo {
-      height: clamp(56px, 14vw, 96px);
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .sidebar-logo {
+      height: 60px;
       width: auto;
       display: block;
-      margin-bottom: 10px;
+      margin: 0 auto 8px;
     }
-    .header-sub {
+    .sidebar-sub {
       font-family: 'DM Mono', monospace;
-      font-weight: 400; font-size: 11px; color: var(--meta);
-      letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 10px; color: var(--meta);
+      letter-spacing: 0.12em; text-transform: uppercase;
     }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
 
-    /* ── TABS ── */
-    .tabs {
-      display: flex; gap: 2px;
-      background: var(--sand); border-radius: 8px; padding: 3px;
-      width: fit-content; margin-bottom: 28px; flex-wrap: wrap;
-    }
+    /* ── TABS (sidebar) ── */
     .tab-btn {
-      font-family: 'Instrument Sans', sans-serif; font-weight: 500; font-size: 13px;
-      padding: 8px 16px; border: none; border-radius: 6px;
-      background: transparent; color: var(--stone); cursor: pointer; transition: all .15s;
+      font-family: 'Instrument Sans', sans-serif; font-weight: 500; font-size: 14px;
+      padding: 10px 14px; border: none; border-radius: 8px;
+      background: transparent; color: var(--stone);
+      cursor: pointer; transition: all .15s;
+      text-align: left; width: 100%;
     }
-    .tab-btn:hover { color: var(--ink); }
-    .tab-btn.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .tab-btn:hover { background: var(--sand); color: var(--ink); }
+    .tab-btn.active { background: var(--ember-bg); color: var(--ember); font-weight: 600; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; padding: 28px 28px 80px; min-width: 0; }
+
+    /* ── SIDEBAR OVERLAY (mobile) ── */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 99;
+    }
+    .sidebar-overlay.open { display: block; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px; background: var(--white);
+        border-bottom: 1px solid var(--border);
+        position: sticky; top: 0; z-index: 50;
+      }
+      .topbar-logo { height: 40px; width: auto; }
+      .hamburger {
+        background: none; border: none; cursor: pointer;
+        padding: 6px; display: flex; flex-direction: column; gap: 5px;
+      }
+      .hamburger span {
+        display: block; width: 22px; height: 2px;
+        background: var(--ink); border-radius: 2px; transition: all .25s;
+      }
+      .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+      .hamburger.open span:nth-child(2) { opacity: 0; }
+      .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+      .sidebar {
+        position: fixed; left: -240px; top: 0; height: 100vh;
+        z-index: 100; transition: left .3s cubic-bezier(.25,.8,.25,1);
+      }
+      .sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.15); }
+      .layout { flex-direction: column; }
+      .main { padding: 20px 16px 80px; }
+    }
 
     /* ── CARDS ── */
     .card {
@@ -400,22 +451,35 @@
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <img src="assets/brand/logo-forja.png" alt="Forja" class="header-logo" />
-  <p class="header-sub">você forja o preço certo.</p>
-</header>
+<!-- TOPBAR: visível só no mobile -->
+<div class="topbar">
+  <img src="assets/brand/logo-forja.png" alt="Forja" class="topbar-logo" />
+  <button class="hamburger" id="hamburger" aria-label="Abrir menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
 
-<div class="app">
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-  <!-- MAIN TABS -->
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="precificar">Precificar</button>
-    <button class="tab-btn" data-tab="comparar">Comparar</button>
-    <button class="tab-btn" data-tab="mercado">Mercado</button>
-    <button class="tab-btn" data-tab="historico">Histórico</button>
-    <button class="tab-btn" data-tab="taxas">Taxas</button>
-  </div>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/brand/logo-forja.png" alt="Forja" class="sidebar-logo" />
+      <p class="sidebar-sub">você forja o preço certo.</p>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="tab-btn active" data-tab="precificar">Precificar</button>
+      <button class="tab-btn" data-tab="comparar">Comparar</button>
+      <button class="tab-btn" data-tab="mercado">Mercado</button>
+      <button class="tab-btn" data-tab="historico">Histórico</button>
+      <button class="tab-btn" data-tab="taxas">Taxas</button>
+    </nav>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="main">
 
   <!-- ═══════════════════════════════════════════
        ABA: PRECIFICAR
@@ -865,7 +929,8 @@
     </div>
   </div>
 
-</div><!-- /app -->
+  </main>
+</div><!-- /layout -->
 
 <script>
 /* ═══════════════════════════════════════
@@ -1405,6 +1470,20 @@ function loadFromHistory(id) {
    INIT
 ═══════════════════════════════════════ */
 setPlataforma('shopee');
+
+/* ── HAMBURGER ── */
+(function() {
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('sidebar-overlay');
+  const close = () => { sb.classList.remove('open'); ov.classList.remove('open'); ham.classList.remove('open'); };
+  const open  = () => { sb.classList.add('open');    ov.classList.add('open');    ham.classList.add('open'); };
+  ham.addEventListener('click', () => sb.classList.contains('open') ? close() : open());
+  ov.addEventListener('click', close);
+  document.querySelectorAll('.sidebar-nav .tab-btn').forEach(b => {
+    b.addEventListener('click', () => { if (window.innerWidth <= 768) close(); });
+  });
+})();
 </script>
 </body>
 </html>
