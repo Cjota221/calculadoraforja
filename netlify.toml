@@ -20,6 +20,12 @@
 [functions."checkout-status"]
   timeout = 10
 
+[[redirects]]
+  from = "/webhook-mercadopago"
+  to = "/.netlify/functions/webhook-mercadopago"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]
