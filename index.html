@@ -119,18 +119,27 @@
     }
     .sidebar-overlay.open { display: block; }
 
+    /* ── BOTTOM NAV (mobile only) ── */
+    .bottom-nav { display: none; }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
+      /* Topbar: hamburger esquerda · logo centro · espaço direita */
       .topbar {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 12px 16px; background: var(--white);
+        display: flex; align-items: center;
+        padding: 10px 16px; background: var(--white);
         border-bottom: 1px solid var(--border);
         position: sticky; top: 0; z-index: 50;
       }
-      .topbar-logo { height: 40px; width: auto; }
+      .topbar-logo {
+        height: 38px; width: auto;
+        position: absolute; left: 50%; transform: translateX(-50%);
+      }
+      .topbar-spacer { width: 34px; margin-left: auto; }
       .hamburger {
         background: none; border: none; cursor: pointer;
         padding: 6px; display: flex; flex-direction: column; gap: 5px;
+        flex-shrink: 0;
       }
       .hamburger span {
         display: block; width: 22px; height: 2px;
@@ -139,13 +148,37 @@
       .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
       .hamburger.open span:nth-child(2) { opacity: 0; }
       .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
       .sidebar {
         position: fixed; left: -240px; top: 0; height: 100vh;
         z-index: 100; transition: left .3s cubic-bezier(.25,.8,.25,1);
       }
       .sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.15); }
       .layout { flex-direction: column; }
-      .main { padding: 20px 16px 80px; }
+      .main { padding: 20px 16px 90px; }
+
+      /* Bottom nav */
+      .bottom-nav {
+        display: flex;
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+        z-index: 50;
+        padding: 6px 0 max(10px, env(safe-area-inset-bottom));
+      }
+      .bottom-nav .tab-btn {
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 2px; padding: 6px 4px;
+        font-size: 11px; font-weight: 600; letter-spacing: 0.01em;
+        border-radius: 0; color: var(--stone); border-top: 2px solid transparent;
+      }
+      .bottom-nav .tab-btn:hover { background: transparent; color: var(--ink); }
+      .bottom-nav .tab-btn.active {
+        color: var(--ember); background: transparent;
+        border-top-color: var(--ember);
+      }
+      .bottom-nav .bnav-icon { font-size: 18px; line-height: 1; }
     }
 
     /* ── CARDS ── */
@@ -469,10 +502,11 @@
 
 <!-- TOPBAR: visível só no mobile -->
 <div class="topbar">
-  <img src="assets/brand/logo-forja.png" alt="Forja" class="topbar-logo" />
   <button class="hamburger" id="hamburger" aria-label="Abrir menu">
     <span></span><span></span><span></span>
   </button>
+  <img src="assets/brand/logo-forja.png" alt="Forja" class="topbar-logo" />
+  <div class="topbar-spacer"></div>
 </div>
 
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -948,6 +982,19 @@
   </main>
 </div><!-- /layout -->
 
+<!-- BOTTOM NAV: mobile only -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="tab-btn active" data-tab="precificar">
+    <span class="bnav-icon">🧮</span>Precificar
+  </button>
+  <button class="tab-btn" data-tab="comparar">
+    <span class="bnav-icon">⚖️</span>Comparar
+  </button>
+  <button class="tab-btn" data-tab="taxas">
+    <span class="bnav-icon">%</span>Taxas
+  </button>
+</nav>
+
 <script>
 /* ═══════════════════════════════════════
    ESTADO GLOBAL
@@ -975,7 +1022,7 @@ const el = id => document.getElementById(id);
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   el(`tab-${tab}`).classList.add('active');
   if (tab === 'historico') renderHistorico();
   if (tab === 'comparar')  calcularComparativo();
