@@ -40,20 +40,29 @@
     }
 
     /* ── LAYOUT ── */
-    .app { max-width: 980px; margin: 0 auto; padding: 36px 20px 80px; }
+    .app { max-width: 980px; margin: 0 auto; padding: 28px 20px 80px; }
 
     /* ── HEADER ── */
-    .header { margin-bottom: 28px; }
+    .header {
+      margin-bottom: 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 32px 20px 28px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
     .header-logo {
-      height: clamp(32px, 5vw, 48px);
+      height: clamp(56px, 14vw, 96px);
       width: auto;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
     .header-sub {
       font-family: 'DM Mono', monospace;
-      font-weight: 400; font-size: 10px; color: var(--meta);
-      letter-spacing: 0.12em; text-transform: uppercase; margin-top: 3px;
+      font-weight: 400; font-size: 11px; color: var(--meta);
+      letter-spacing: 0.14em; text-transform: uppercase;
     }
 
     /* ── TABS ── */
@@ -390,13 +399,14 @@
   </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- HEADER -->
-  <header class="header">
-    <img src="assets/brand/logo-forja.png" alt="Forja" class="header-logo" />
-    <p class="header-sub">você forja o preço certo.</p>
-  </header>
+<!-- HEADER -->
+<header class="header">
+  <img src="assets/brand/logo-forja.png" alt="Forja" class="header-logo" />
+  <p class="header-sub">você forja o preço certo.</p>
+</header>
+
+<div class="app">
 
   <!-- MAIN TABS -->
   <div class="tabs">
